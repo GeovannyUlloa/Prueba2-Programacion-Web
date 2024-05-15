@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        p {
+            position: absolute;
+            font-family: sans-serif;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <label for="texto">ingrese un texto</label>
+        <input type="text" id="texto"></div>
+    <button onclick="imprimir()">agregar</button>
+    <div id="container"></div>
+
+
+    <script>
+        var container = document.getElementById("container");
+        var ancho = window.innerWidth;
+        var alto = window.innerHeight;
+        var matriz = [0, 0, 0];
+        function imprimir() {
+            for (j = 0; j < matriz.length; j++) {
+                matriz[j] = Math.floor(Math.random() * 250) + 1;
+            }
+            var para = document.createElement("p");
+            var text=document.getElementById("texto");
+            var node = document.createTextNode(text.value);
+            para.appendChild(node);
+            para.style.color = `rgb(${matriz[0]},${matriz[1]},${matriz[2]})`;
+            var posx = Math.floor(Math.random() * ancho);
+            var posy = Math.floor(Math.random() * alto);
+            para.style.left = posx + "px";
+            para.style.top = posy + "px";
+            para.addEventListener("click", function () {
+                container.removeChild(para);
+            })
+
+
+            para.addEventListener("mousedown", function (evento) {
+                var diferencordsx = evento.clientX - para.getBoundingClientRect().left;
+                var diferencordsy = evento.clientY - para.getBoundingClientRect().top;
+
+                function actualizar(move) {
+                    var newposx = move.clientX - diferencordsx;
+                    var newposy = move.clientY - diferencordsy;
+                    para.style.left = newposx + "px";
+                    para.style.top = newposy + "px";
+                }
+
+                function detenermov() {
+                    document.removeEventListener("mousemove", actualizar);
+                    document.removeEventListener("mouseup", detenermov);
+                }
+                document.addEventListener("mousemove", actualizar);
+                document.addEventListener("mouseup", detenermov);
+            });
+            container.appendChild(para);
+        }
+    </script>
+</body>
+
+</html>

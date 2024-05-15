@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data</title>
+</head>
+<body>
+    <h1>Weather Data</h1>
+    <form id="location-form">
+        <label for="location-input">Enter Location:</label>
+        <input type="text" id="location-input" name="location">
+        <button type="submit">Get Weather</button>
+    </form>
+
+    <div id="weather-info"></div>
+
+    <script>
+        document.getElementById('location-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            const location = document.getElementById('location-input').value;
+            obtenerDatosClima(location);
+        });
+
+        function obtenerDatosClima(ubicacion) {
+            const xhr = new XMLHttpRequest();
+            xhr.withCredentials = true;
+
+            xhr.addEventListener('readystatechange', function () {
+                if (this.readyState === this.DONE) {
+                    const response = JSON.parse(this.responseText);
+                    mostrarDatosClima(response);
+                }
+            });
+
+            const endpoint = `https://yahoo-weather5.p.rapidapi.com/weather?location=${encodeURIComponent(ubicacion)}&format=json&u=c`;
+
+            xhr.open('GET', endpoint);
+            xhr.setRequestHeader('X-RapidAPI-Key', '1c6a56f4b1mshcf9b7a1abc469e9p1c8e58jsnd501b2ed0171');
+            xhr.setRequestHeader('X-RapidAPI-Host', 'yahoo-weather5.p.rapidapi.com');
+
+            xhr.send();
+        }
+
+        function mostrarDatosClima(datos) {
+            const weatherInfo = document.getElementById('weather-info');
+            weatherInfo.innerHTML = ''; // Limpiar contenido anterior
+            
+            if (datos.error) {
+                weatherInfo.innerText = 'Error: ' + datos.error.message;
+            } else {
+                const currentConditions = datos.current_observation;
+                const forecasts = datos.forecasts;
+
+                const currentHTML = `
+                    <h2>Current Conditions for ${datos.location.city}, ${datos.location.country}</h2>
+                    <p>Temperature: ${currentConditions.condition.temperature}°C</p>
+                    <p>Condition: ${currentConditions.condition.text}</p>
+                    <p>Wind Chill: ${currentConditions.wind.chill}°C</p>
+                    <p>Wind Direction: ${currentConditions.wind.direction}</p>
+                    <p>Wind Speed: ${currentConditions.wind.speed} km/h</p>
+                    <p>Humidity: ${currentConditions.atmosphere.humidity}%</p>
+                    <p>Visibility: ${currentConditions.atmosphere.visibility} km</p>
+                    <p>Pressure: ${currentConditions.atmosphere.pressure} mb</p>
+                    <p>Sunrise: ${currentConditions.astronomy.sunrise}</p>
+                    <p>Sunset: ${currentConditions.astronomy.sunset}</p>
+                `;
+                weatherInfo.innerHTML = currentHTML;
+
+                const forecastHTML = `
+                    <h2>Forecast</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>High (°C)</th>
+                                <th>Low (°C)</th>
+                                <th>Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${forecasts.map(forecast => `
+                                <tr>
+                                    <td>${forecast.day}</td>
+                                    <td>${forecast.high}</td>
+                                    <td>${forecast.low}</td>
+                                    <td>${forecast.text}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                weatherInfo.innerHTML += forecastHTML;
+            }
+        }
+    </script>
+</body>
+</html>
