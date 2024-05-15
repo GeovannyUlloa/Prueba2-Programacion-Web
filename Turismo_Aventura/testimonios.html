@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+                body {
+            font-family: Arial, sans-serif;
+            background-color: #c7e4be;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        p {
+            position: absolute;
+            font-family: sans-serif;
+            font-size: 20px;
+        }
+        li{
+            font-family: sans-serif;
+            font-size: 20px;
+        }
+        label{
+            font-size: 30px;
+        }
+        #agregar{
+            font-size: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <label for="texto">Ingrese un comentario sobre el lugar visitado</label>
+        <input type="text" id="texto"></div>
+        <ul id="comentarios">
+
+
+        </ul>
+    <button id="agregar" onclick="imprimir()">agregar</button>
+    <div id="container"></div>
+
+
+    <script>
+        var container = document.getElementById("container");
+        var comentarios=document.getElementById("comentarios");
+        var ancho = window.innerWidth;
+        var alto = window.innerHeight;
+        var matriz = [0, 0, 0];
+        function imprimir() {
+            var para = document.createElement("li");
+            var text=document.getElementById("texto");
+            var node = document.createTextNode(text.value);
+            para.appendChild(node);
+            comentarios.appendChild(para);
+            para.addEventListener("click", function () {
+                container.removeChild(para);
+            })
+
+            para.addEventListener("mousedown", function (evento) {
+                var diferencordsx = evento.clientX - para.getBoundingClientRect().left;
+                var diferencordsy = evento.clientY - para.getBoundingClientRect().top;
+
+                function actualizar(move) {
+                    var newposx = move.clientX - diferencordsx;
+                    var newposy = move.clientY - diferencordsy;
+                    para.style.left = newposx + "px";
+                    para.style.top = newposy + "px";
+                }
+
+                function detenermov() {
+                    document.removeEventListener("mousemove", actualizar);
+                    document.removeEventListener("mouseup", detenermov);
+                }
+                document.addEventListener("mousemove", actualizar);
+                document.addEventListener("mouseup", detenermov);
+            });
+            container.appendChild(para);
+        }
+    </script>
+</body>
+
+</html>
